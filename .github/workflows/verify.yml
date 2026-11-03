@@ -1,0 +1,30 @@
+name: Verify Lean certificate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Check out the submitted sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up the pinned Lean toolchain and mathlib cache
+        uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: true
+          use-github-cache: false
+      - name: Build, kernel-check, and audit
+        run: bash scripts/check.sh
